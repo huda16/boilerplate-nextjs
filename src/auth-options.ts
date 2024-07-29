@@ -6,10 +6,6 @@ import { AxiosError } from "axios";
 
 import axiosServer from "@/lib/axios-server";
 
-export const isWholeNumber = (str: string): boolean => {
-  return /^\d+$/.test(str);
-};
-
 function extractUserData(user: User) {
   const {
     userId,
