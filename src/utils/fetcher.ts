@@ -15,11 +15,19 @@ type DownloadData = FetchData & {
   format?: string | "PREDEFINED";
 };
 
+type Meta = {
+  page: number;
+  pageSize: number;
+  rowCount: number;
+  pageCount: number;
+};
+
 type CommonResponse<R> = {
   data: R;
-  message: string;
-  status: string;
-  success: boolean;
+  meta?: Meta;
+  // message: string;
+  // status: string;
+  // success: boolean;
 };
 
 // type CommonResponse<R> = R;
@@ -29,7 +37,7 @@ export const fetchData = async <R>({
   method,
   params,
   ...rest
-}: FetchData): Promise<R> => {
+}: FetchData): Promise<CommonResponse<R>> => {
   try {
     const response = await axios.request<CommonResponse<R>>({
       url,
@@ -37,7 +45,7 @@ export const fetchData = async <R>({
       params,
       ...rest,
     });
-    return response.data.data;
+    return response.data;
   } catch (error) {
     const axiosError = error as AxiosError<CommonResponse<R>>;
     throw axiosError.response?.data ?? error;

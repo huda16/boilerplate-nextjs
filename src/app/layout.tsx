@@ -4,8 +4,10 @@ import { Inter } from "next/font/google";
 import MaterialUiProvider from "@/providers/material-ui-provider";
 import ReactQueryProvider from "@/providers/react-query-provider";
 import { SessionProvider } from "@/providers/session-provider";
+import { SnackbarProvider } from "@/providers/snackbar-provider";
 
 import "./globals.css";
+import "./globalsicons.css";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -24,7 +26,9 @@ export default function RootLayout({
       <body className={inter.className}>
         <SessionProvider>
           <ReactQueryProvider>
-            <MaterialUiProvider>{children}</MaterialUiProvider>
+            <MaterialUiProvider>
+              <SnackbarProvider>{children}</SnackbarProvider>
+            </MaterialUiProvider>
           </ReactQueryProvider>
         </SessionProvider>
       </body>

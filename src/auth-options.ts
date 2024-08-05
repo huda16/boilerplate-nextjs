@@ -1,4 +1,4 @@
-import { type NextAuthOptions, User } from "next-auth";
+import { type NextAuthOptions } from "next-auth";
 import { JWT } from "next-auth/jwt";
 import CredentialsProvider from "next-auth/providers/credentials";
 
@@ -6,56 +6,22 @@ import { AxiosError } from "axios";
 
 import axiosServer from "@/lib/axios-server";
 
-function extractUserData(user: User) {
-  const {
-    userId,
-    fullname,
-    profilePicture,
-    permission_keys,
-    role_keys,
-    email,
-    mobile,
-  } = user;
-  return {
-    userId,
-    fullname,
-    profilePicture,
-    permission_keys,
-    role_keys,
-    email,
-    mobile,
-  };
-}
-
 async function refreshToken(token: JWT): Promise<JWT> {
-  const body = new URLSearchParams({
-    refresh_token: token?.refreshToken,
-    grant_type: "refresh_token",
-  });
-  const config = {
-    headers: {
-      apikey: process.env.API_KEY,
-    },
-    auth: {
-      username: process.env.API_USERNAME,
-      password: process.env.API_PASSWORD,
-    },
+  const body = {
+    refreshToken: token?.refreshToken,
   };
-  const response = await axiosServer.post(
-    "/account/users/v1/token/oauth",
-    body,
-    config,
-  );
+  const response = await axiosServer.post("/auth/refresh", body, {
+    isSkipAuth: true,
+  });
 
   console.info(
     "NextAuth::Refresh Token",
-    response.data.data.accessToken?.substr(-5),
+    response.data?.data?.accessToken?.substr(-5),
   );
 
   return {
     ...token,
-    ...response.data.data,
-    user: extractUserData(response.data.data.user),
+    ...response.data?.data,
   };
 }
 
@@ -86,30 +52,14 @@ export const authOptions: NextAuthOptions = {
           )
             return null;
           const { email, password, recaptcha } = credentials;
-          const body = new URLSearchParams({
-            username: email,
+          const body = {
+            email,
             password,
-            grant_type: "password",
-            "g-recaptcha-response": recaptcha,
+          };
+          const response = await axiosServer.post("/auth/login", body, {
+            isSkipAuth: true,
           });
-          const config = {
-            headers: {
-              apikey: process.env.API_KEY,
-            },
-            auth: {
-              username: process.env.API_USERNAME,
-              password: process.env.API_PASSWORD,
-            },
-          };
-          const response = await axiosServer.post(
-            "/account/users/v1/auth/recaptcha",
-            body,
-            config,
-          );
-          return {
-            ...response.data.data,
-            user: extractUserData(response.data.data.user),
-          };
+          return response.data?.data;
         } catch (error) {
           if (error instanceof AxiosError) {
             throw new Error(error.response?.data?.message);
@@ -129,7 +79,7 @@ export const authOptions: NextAuthOptions = {
         return { ...token, ...user };
       }
 
-      if (Date.now() < Date.parse(token.accessTokenExpiresAt)) {
+      if (Date.now() / 1000 < token.accessTokenExpiresAt) {
         return token;
       }
 
@@ -141,12 +91,11 @@ export const authOptions: NextAuthOptions = {
       session.accessTokenExpiresAt = token.accessTokenExpiresAt;
       session.refreshToken = token.refreshToken;
       session.refreshTokenExpiresAt = token.refreshTokenExpiresAt;
-      session.client = token.client;
 
       return session;
     },
   },
   pages: {
-    signIn: "/login",
+    signIn: "/signin",
   },
 };

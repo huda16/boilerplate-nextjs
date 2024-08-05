@@ -1,7 +1,7 @@
 import { Session } from "next-auth";
 import { getSession } from "next-auth/react";
 
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 
 let lastSession: Session | null = null;
 
@@ -18,7 +18,7 @@ const ApiClient = () => {
 
       if (
         lastSession === null ||
-        Date.now() > Date.parse(lastSession.accessTokenExpiresAt)
+        Date.now() / 1000 > lastSession.accessTokenExpiresAt
       ) {
         const session = await getSession();
         lastSession = session;
@@ -26,14 +26,43 @@ const ApiClient = () => {
 
       if (lastSession) {
         request.headers.Authorization = `Bearer ${lastSession.accessToken}`;
-        request.headers.apikey = process.env.NEXT_PUBLIC_API_KEY;
       }
 
       return request;
     },
     (error) => {
-      console.error("AxiosInterceptors::", error);
+      console.error("AxiosInterceptors Request onRejected::", error);
       throw error;
+    },
+  );
+
+  instance.interceptors.response.use(
+    (response) => {
+      return response;
+    },
+    async (error: AxiosError) => {
+      if (error.response && error.response.status === 401) {
+        if (
+          lastSession === null ||
+          Date.now() / 1000 > lastSession.accessTokenExpiresAt
+        ) {
+          const session = await getSession();
+          lastSession = session;
+        }
+
+        const config = error.config;
+
+        if (config && lastSession) {
+          const bearer = `Bearer ${lastSession.accessToken}`;
+          config.headers.Authorization = bearer;
+          return axios.request(config);
+        } else {
+          console.error(
+            "AxiosInterceptors Response 401:: Error config is undefined",
+          );
+        }
+      }
+      return Promise.reject(error);
     },
   );
 

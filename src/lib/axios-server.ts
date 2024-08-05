@@ -18,7 +18,7 @@ const ApiClient = () => {
 
       if (
         lastSession === null ||
-        Date.now() > Date.parse(lastSession.accessTokenExpiresAt)
+        Date.now() / 1000 > lastSession.accessTokenExpiresAt
       ) {
         const session = await getServerSession(authOptions);
         lastSession = session;
@@ -26,7 +26,6 @@ const ApiClient = () => {
 
       if (lastSession) {
         request.headers.Authorization = `Bearer ${lastSession.accessToken}`;
-        request.headers.apikey = process.env.API_KEY;
       }
 
       return request;
