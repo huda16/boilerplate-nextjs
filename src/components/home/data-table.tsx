@@ -150,7 +150,12 @@ export function DataTable() {
             <MRT_GlobalFilterTextField table={table} />
             <MRT_ToggleFiltersButton table={table} />
             <Tooltip arrow title="Refresh Data">
-              <IconButton onClick={() => getUsers.refetch()}>
+              <IconButton
+                onClick={() => {
+                  table.resetColumnFilters();
+                  table.resetGlobalFilter();
+                }}
+              >
                 <RefreshIcon />
               </IconButton>
             </Tooltip>
