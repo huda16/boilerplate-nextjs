@@ -6,7 +6,6 @@ import { AccountCircle, Send } from "@mui/icons-material";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import {
   Box,
-  Button,
   IconButton,
   ListItemIcon,
   Menu,
@@ -16,9 +15,15 @@ import {
 } from "@mui/material";
 import { json2csv } from "json-2-csv";
 import {
+  MRT_ColumnFilterFnsState,
+  MRT_ColumnFiltersState,
   MRT_GlobalFilterTextField,
   MRT_PaginationState,
+  MRT_ShowHideColumnsButton,
+  MRT_SortingState,
+  MRT_ToggleDensePaddingButton,
   MRT_ToggleFiltersButton,
+  MRT_ToggleFullScreenButton,
   MaterialReactTable,
   useMaterialReactTable,
 } from "material-react-table";
@@ -26,10 +31,23 @@ import * as XLSX from "xlsx";
 
 import { useGetUsers } from "@/hooks/queries/users";
 
+import { convertFEParamsToAPIParams } from "@/utils/helpers";
+
 import { Icon } from "../ui/icon";
 import { columns } from "./columns";
 
 export function DataTable() {
+  const [columnFilters, setColumnFilters] = useState<MRT_ColumnFiltersState>(
+    [],
+  );
+  const [columnFilterFns, setColumnFilterFns] =
+    useState<MRT_ColumnFilterFnsState>(
+      Object.fromEntries(
+        columns.map(({ accessorKey }) => [accessorKey, "contains"]),
+      ),
+    );
+  const [globalFilter, setGlobalFilter] = useState<string>("");
+  const [sorting, setSorting] = useState<MRT_SortingState>([]);
   const [pagination, setPagination] = useState<MRT_PaginationState>({
     pageIndex: 0,
     pageSize: 10,
@@ -71,15 +89,36 @@ export function DataTable() {
     handleClose();
   };
 
-  const getUsers = useGetUsers({
-    page: pagination.pageIndex + 1,
-    pageSize: pagination.pageSize,
-  });
+  const getUsers = useGetUsers(
+    convertFEParamsToAPIParams({
+      pagination,
+      columnFilterFns,
+      columnFilters,
+      sorting,
+      globalFilter,
+    }),
+  );
 
   const table = useMaterialReactTable({
     columns,
     data: getUsers.data?.data ?? [],
-    state: { pagination, isLoading: getUsers.isFetching },
+    initialState: {
+      showColumnFilters: false,
+      showGlobalFilter: false,
+      columnPinning: {
+        left: ["mrt-row-select"],
+        right: ["mrt-row-actions"],
+      },
+      density: "compact",
+    },
+    state: {
+      columnFilters,
+      globalFilter,
+      sorting,
+      pagination,
+      columnFilterFns,
+      isLoading: getUsers.isFetching,
+    },
     enableColumnFilterModes: true,
     enableColumnOrdering: true,
     enableGrouping: true,
@@ -87,14 +126,6 @@ export function DataTable() {
     enableFacetedValues: true,
     enableRowActions: true,
     enableRowSelection: true,
-    initialState: {
-      showColumnFilters: false,
-      showGlobalFilter: true,
-      columnPinning: {
-        left: ["mrt-row-expand", "mrt-row-select"],
-        right: ["mrt-row-actions"],
-      },
-    },
     paginationDisplayMode: "pages",
     positionToolbarAlertBanner: "bottom",
     muiSearchTextFieldProps: {
@@ -104,9 +135,15 @@ export function DataTable() {
     muiPaginationProps: {
       rowsPerPageOptions: [5, 10, 20, 30, 100],
     },
+    manualFiltering: true,
+    manualSorting: true,
     manualPagination: true,
     rowCount: getUsers.data?.meta?.rowCount,
+    onColumnFiltersChange: setColumnFilters,
+    onGlobalFilterChange: setGlobalFilter,
+    onSortingChange: setSorting,
     onPaginationChange: setPagination,
+    onColumnFilterFnsChange: setColumnFilterFns,
     renderRowActionMenuItems: ({ closeMenu }) => [
       <MenuItem
         key={0}
@@ -143,17 +180,22 @@ export function DataTable() {
             display: "flex",
             gap: "0.5rem",
             p: "8px",
-            justifyContent: "space-between",
+            justifyContent: "flex-end",
           })}
         >
           <Box sx={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
             <MRT_GlobalFilterTextField table={table} />
             <MRT_ToggleFiltersButton table={table} />
-            <Tooltip arrow title="Refresh Data">
+            <MRT_ShowHideColumnsButton table={table} />
+            <MRT_ToggleDensePaddingButton table={table} />
+            <MRT_ToggleFullScreenButton table={table} />
+            <Tooltip arrow title="Reset Filter">
               <IconButton
                 onClick={() => {
-                  table.resetColumnFilters();
                   table.resetGlobalFilter();
+                  table.resetColumnFilters();
+                  table.setGlobalFilter("");
+                  table.setColumnFilters([]);
                 }}
               >
                 <RefreshIcon />

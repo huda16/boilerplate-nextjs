@@ -39,6 +39,7 @@ export const NavigationItems = () => {
           <ListItemButton
             onClick={() => handleClick(itemKey)}
             sx={{ pl: 2 * level + 2 }}
+            dense
             {...(item.href ? { href: item.href } : {})}
           >
             <ListItemIcon>
