@@ -1,15 +1,13 @@
 "use client";
 
-import { useState } from "react";
-
-import { signIn, signOut, useSession } from "next-auth/react";
-
+import { useDrawerStore } from "@/stores/useDrawerStore";
 import MenuIcon from "@mui/icons-material/Menu";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import {
   AppBarProps,
   Badge,
   Box,
+  Container,
   IconButton,
   List,
   AppBar as MuiAppBar,
@@ -72,13 +70,8 @@ const Drawer = styled(MuiDrawer, {
 }));
 
 export default function DashboardLayout({ children }: DashboardLayoutProps) {
-  const { status } = useSession();
-
-  const [open, setOpen] = useState(true);
-
-  const toggleDrawer = () => {
-    setOpen(!open);
-  };
+  // const [open, setOpen] = useState(true);
+  const { open, toggleDrawer } = useDrawerStore();
 
   return (
     <Stack spacing={1}>
@@ -132,7 +125,25 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
             <NavigationItems />
           </List>
         </Drawer>
-        {children}
+        <Box
+          component="main"
+          sx={{
+            flexGrow: 1,
+            overflow: "auto",
+          }}
+        >
+          <Toolbar
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "flex-end",
+              px: [1],
+            }}
+          />
+          <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
+            {children}
+          </Container>
+        </Box>
       </Box>
     </Stack>
   );

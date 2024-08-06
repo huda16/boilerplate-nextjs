@@ -20,6 +20,7 @@ export const useGetMenu = () => {
       {
         label: "Dashboard",
         icon: "dashboard",
+        href: "/",
         children: [],
       },
       {
@@ -29,26 +30,31 @@ export const useGetMenu = () => {
           {
             label: "Users",
             icon: "person",
+            href: "/user-managements/users",
             children: [],
           },
           {
             label: "Permissions",
             icon: "vpn_key",
+            href: "/user-managements/permissions",
             children: [],
           },
           {
             label: "Roles",
             icon: "admin_panel_settings",
+            href: "/user-managements/roles",
             children: [],
           },
           {
             label: "Menu Items",
             icon: "menu",
+            href: "/user-managements/menu-items",
             children: [],
           },
           {
             label: "Master Menu",
             icon: "view_list",
+            href: "/user-managements/master-menu",
             children: [],
           },
         ],

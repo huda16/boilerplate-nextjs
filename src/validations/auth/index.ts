@@ -36,6 +36,7 @@ export const profileSchema = z.object({
 const baseMenuSchema = z.object({
   label: z.string(),
   icon: z.string(),
+  href: z.string().optional(),
 });
 
 export const menuSchema = baseMenuSchema.extend({
