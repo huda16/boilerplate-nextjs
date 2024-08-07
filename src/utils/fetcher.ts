@@ -16,18 +16,16 @@ type DownloadData = FetchData & {
 };
 
 type Meta = {
-  page: number;
-  pageSize: number;
-  rowCount: number;
-  pageCount: number;
+  current_page?: number;
+  limit?: number;
+  total?: number;
 };
 
 type CommonResponse<R> = {
   data: R;
-  meta?: Meta;
-  // message: string;
-  // status: string;
-  // success: boolean;
+  message: string;
+  status: string;
+  meta: Meta;
 };
 
 // type CommonResponse<R> = R;

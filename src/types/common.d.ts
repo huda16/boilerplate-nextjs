@@ -1,7 +1,6 @@
 type FetchError = {
-  data?: {
-    message?: string;
-  };
+  message?: string;
+  code?: number;
 } | null;
 
 type Meta = {

@@ -1,25 +1,14 @@
-import { cache } from "react";
+import { QueryClient } from "@tanstack/react-query";
 
-import { QueryClient, QueryClientConfig } from "@tanstack/react-query";
-
-const STALE_TIME = 1000 * 60 * 5; // 5 minutes
-
-export const queryClientConfig: QueryClientConfig = {
+export const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       refetchOnWindowFocus: false,
-      staleTime: STALE_TIME,
-      retry: (failureCount) => {
+      retry: (failureCount, error) => {
+        if ((error as FetchError)?.code === 404) return false;
         if (failureCount < 1) return true;
         return false;
       },
     },
-    mutations: {
-      onError: (error: Error) => {
-        console.error(error.message);
-      },
-    },
   },
-};
-
-export const getQueryClient = cache(() => new QueryClient(queryClientConfig));
+});

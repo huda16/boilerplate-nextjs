@@ -55,17 +55,17 @@ export function SignInForm({ searchParams }: SignInFormProps) {
     register,
     handleSubmit,
     setError,
-    formState: { isValid, errors },
+    formState: { errors },
   } = useForm<SignInFormType>({
     resolver: zodResolver(signInFormSchema),
-    mode: "onChange",
+    mode: "all",
     defaultValues: {
-      email: "",
+      username: "",
       password: "",
     },
   });
 
-  const onSubmit = async ({ email, password }: SignInFormType) => {
+  const onSubmit = async ({ username, password }: SignInFormType) => {
     if (!executeRecaptcha) {
       return setError("root", {
         message:
@@ -77,7 +77,7 @@ export function SignInForm({ searchParams }: SignInFormProps) {
 
     const recaptcha = await executeRecaptcha();
     const auth = await signIn("credentials", {
-      email,
+      username,
       password,
       recaptcha,
       redirect: false,
@@ -123,15 +123,15 @@ export function SignInForm({ searchParams }: SignInFormProps) {
             margin="normal"
             required
             fullWidth
-            id="email"
-            label="Email"
-            autoComplete="email"
+            id="username"
+            label="Username"
+            autoComplete="username"
             autoFocus
             disabled={isLoading}
             size="small"
-            {...register("email")}
-            error={!!errors.email}
-            helperText={errors.email?.message}
+            {...register("username")}
+            error={!!errors.username}
+            helperText={errors.username?.message}
           />
           <TextField
             margin="normal"
@@ -169,7 +169,7 @@ export function SignInForm({ searchParams }: SignInFormProps) {
             fullWidth
             variant="contained"
             sx={{ mt: 3, mb: 2 }}
-            disabled={!isValid || isLoading}
+            disabled={isLoading}
           >
             {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             Sign In

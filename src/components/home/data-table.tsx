@@ -6,6 +6,12 @@ import { AccountCircle, Send } from "@mui/icons-material";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import {
   Box,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
   IconButton,
   ListItemIcon,
   Menu,
@@ -27,9 +33,11 @@ import {
   MaterialReactTable,
   useMaterialReactTable,
 } from "material-react-table";
+import { useSnackbar } from "notistack";
 import * as XLSX from "xlsx";
 
-import { useGetUsers } from "@/hooks/queries/users";
+import { useDeleteUser } from "@/hooks/mutations/user-managements";
+import { useGetUsers } from "@/hooks/queries/user-managements";
 
 import { convertFEParamsToAPIParams } from "@/utils/helpers";
 
@@ -37,6 +45,8 @@ import { Icon } from "../ui/icon";
 import { columns } from "./columns";
 
 export function DataTable() {
+  const { enqueueSnackbar } = useSnackbar();
+
   const [columnFilters, setColumnFilters] = useState<MRT_ColumnFiltersState>(
     [],
   );
@@ -53,8 +63,10 @@ export function DataTable() {
     pageSize: 10,
   });
 
+  const [isOpenDeleteDialog, setIsOpenDeleteDialog] = useState(false);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
+
   const handleClickExport = (event: MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
   };
@@ -99,6 +111,8 @@ export function DataTable() {
     }),
   );
 
+  const deleteUser = useDeleteUser();
+
   const table = useMaterialReactTable({
     columns,
     data: getUsers.data?.data ?? [],
@@ -106,8 +120,8 @@ export function DataTable() {
       showColumnFilters: false,
       showGlobalFilter: false,
       columnPinning: {
-        left: ["mrt-row-select"],
-        right: ["mrt-row-actions"],
+        left: ["mrt-row-select", "mrt-row-actions"],
+        // right: ["mrt-row-actions"],
       },
       density: "compact",
     },
@@ -138,12 +152,77 @@ export function DataTable() {
     manualFiltering: true,
     manualSorting: true,
     manualPagination: true,
-    rowCount: getUsers.data?.meta?.rowCount,
+    rowCount: getUsers.data?.meta.total,
     onColumnFiltersChange: setColumnFilters,
     onGlobalFilterChange: setGlobalFilter,
     onSortingChange: setSorting,
     onPaginationChange: setPagination,
     onColumnFilterFnsChange: setColumnFilterFns,
+    renderRowActions: ({ row, table }) => (
+      <Box sx={{ display: "flex", gap: "1rem" }}>
+        <Tooltip title="Edit">
+          <IconButton
+            size="small"
+            href={`/user-managements/users/${row.original.id}`}
+          >
+            <Icon>edit</Icon>
+          </IconButton>
+        </Tooltip>
+        <Tooltip title="Delete">
+          <IconButton
+            size="small"
+            color="error"
+            onClick={() => {
+              setIsOpenDeleteDialog((prev) => !prev);
+            }}
+          >
+            <Icon>delete</Icon>
+          </IconButton>
+        </Tooltip>
+        <Dialog
+          open={isOpenDeleteDialog}
+          onClose={() => setIsOpenDeleteDialog((prev) => !prev)}
+          aria-labelledby="alert-dialog-title"
+          aria-describedby="alert-dialog-description"
+        >
+          <DialogTitle>Delete user?</DialogTitle>
+          <DialogContent>
+            <DialogContentText>
+              Are you sure you want to remove this user? This action cannot be
+              undone.
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => setIsOpenDeleteDialog((prev) => !prev)}>
+              Cancel
+            </Button>
+            <Button
+              onClick={() => {
+                deleteUser.mutate(
+                  { id: row.original.id },
+                  {
+                    onSuccess: () => {
+                      enqueueSnackbar("Success delete user", {
+                        variant: "success",
+                      });
+                    },
+                    onError: (error) => {
+                      enqueueSnackbar(error.message, { variant: "error" });
+                    },
+                    onSettled: () => {
+                      setIsOpenDeleteDialog((prev) => !prev);
+                    },
+                  },
+                );
+              }}
+              autoFocus
+            >
+              Delete
+            </Button>
+          </DialogActions>
+        </Dialog>
+      </Box>
+    ),
     renderRowActionMenuItems: ({ closeMenu }) => [
       <MenuItem
         key={0}
@@ -180,9 +259,16 @@ export function DataTable() {
             display: "flex",
             gap: "0.5rem",
             p: "8px",
-            justifyContent: "flex-end",
+            justifyContent: "space-between",
           })}
         >
+          <Button
+            variant="contained"
+            href="/user-managements/users/create"
+            startIcon={<Icon>add</Icon>}
+          >
+            Create
+          </Button>
           <Box sx={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
             <MRT_GlobalFilterTextField table={table} />
             <MRT_ToggleFiltersButton table={table} />
@@ -196,6 +282,14 @@ export function DataTable() {
                   table.resetColumnFilters();
                   table.setGlobalFilter("");
                   table.setColumnFilters([]);
+                  table.setColumnFilterFns(
+                    Object.fromEntries(
+                      columns.map(({ accessorKey }) => [
+                        accessorKey,
+                        "contains",
+                      ]),
+                    ),
+                  );
                 }}
               >
                 <RefreshIcon />

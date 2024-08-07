@@ -10,7 +10,8 @@ async function refreshToken(token: JWT): Promise<JWT> {
   const body = {
     refreshToken: token?.refreshToken,
   };
-  const response = await axiosServer.post("/auth/refresh", body, {
+  console.log("NextAuth::BodyRefresh", body);
+  const response = await axiosServer.put("/authentications", body, {
     isSkipAuth: true,
   });
 
@@ -30,8 +31,8 @@ export const authOptions: NextAuthOptions = {
     CredentialsProvider({
       name: "Credentials",
       credentials: {
-        email: {
-          label: "Email",
+        username: {
+          label: "Username",
           type: "text",
         },
         password: {
@@ -46,17 +47,17 @@ export const authOptions: NextAuthOptions = {
       async authorize(credentials) {
         try {
           if (
-            !credentials?.email ||
+            !credentials?.username ||
             !credentials?.password ||
             !credentials?.recaptcha
           )
             return null;
-          const { email, password, recaptcha } = credentials;
+          const { username, password, recaptcha } = credentials;
           const body = {
-            email,
+            username,
             password,
           };
-          const response = await axiosServer.post("/auth/login", body, {
+          const response = await axiosServer.post("/authentications", body, {
             isSkipAuth: true,
           });
           return response.data?.data;

@@ -1,14 +1,14 @@
 import { z } from "zod";
 
 export const signInFormSchema = z.object({
-  email: z.string().min(1, { message: "Invalid Email" }),
+  username: z.string().min(1, { message: "Invalid Username" }),
   password: z.string().min(1, { message: "Invalid Password" }),
 });
 
 export const signUpFormSchema = z
   .object({
     username: z.string().min(1, { message: "Invalid Username" }),
-    email: z.string().email().min(1, { message: "Invalid Email" }),
+    email: z.string().email().min(1, { message: "Invalid Username" }),
     password: z.string().min(1, { message: "Invalid Password" }),
     confirm_password: z
       .string()
@@ -27,10 +27,11 @@ export const signUpFormSchema = z
 
 export const profileSchema = z.object({
   id: z.number(),
-  name: z.string(),
+  name: z.union([z.string(), z.null()]),
   email: z.string().email(),
-  createdAt: z.string(),
-  updatedAt: z.string(),
+  username: z.string(),
+  created_at: z.string(),
+  updated_at: z.string(),
 });
 
 const baseMenuSchema = z.object({

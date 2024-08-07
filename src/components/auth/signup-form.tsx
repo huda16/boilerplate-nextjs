@@ -43,10 +43,10 @@ export function SignUpForm() {
     register,
     handleSubmit,
     setError,
-    formState: { isValid, errors },
+    formState: { errors },
   } = useForm<SignUpFormType>({
     resolver: zodResolver(signUpFormSchema),
-    mode: "onChange",
+    mode: "all",
     defaultValues: {
       name: "",
       username: "",
@@ -237,7 +237,7 @@ export function SignUpForm() {
             fullWidth
             variant="contained"
             sx={{ mt: 3, mb: 2 }}
-            disabled={!isValid || isLoading}
+            disabled={isLoading}
           >
             {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             Sign Up
