@@ -31,6 +31,7 @@ import {
   MRT_ToggleDensePaddingButton,
   MRT_ToggleFiltersButton,
   MRT_ToggleFullScreenButton,
+  MRT_ToggleGlobalFilterButton,
   MaterialReactTable,
   useMaterialReactTable,
 } from "material-react-table";
@@ -386,6 +387,7 @@ export function DataTable() {
               Create
             </Button>
             <MRT_GlobalFilterTextField table={table} />
+            <MRT_ToggleGlobalFilterButton table={table} />
             <MRT_ToggleFiltersButton table={table} />
             <MRT_ShowHideColumnsButton table={table} />
             <MRT_ToggleDensePaddingButton table={table} />

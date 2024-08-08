@@ -57,7 +57,7 @@ export function SignInForm({ searchParams }: SignInFormProps) {
     formState: { errors },
   } = useForm<SignInFormType>({
     resolver: zodResolver(signInFormSchema),
-    mode: "all",
+    mode: "onChange",
     defaultValues: {
       username: "",
       password: "",

@@ -52,7 +52,7 @@ export default function UserForm({ initialData }: UserFormProps) {
     formState: { errors },
   } = useForm<UserManagementsUsersType>({
     resolver: zodResolver(userManagementsUsersSchema),
-    mode: "all",
+    mode: "onChange",
     defaultValues: {
       username: initialData?.username ?? "",
       email: initialData?.email ?? "",
