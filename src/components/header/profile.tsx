@@ -17,11 +17,11 @@ import {
   Tooltip,
 } from "@mui/material";
 
-// import { useGetProfile } from "@/hooks/queries/auth";
+import { useGetProfile } from "@/hooks/queries/auth";
 
 export default function Profile() {
   const { status } = useSession();
-  // const getProfileOriginal = useGetProfile();
+  const getProfileOriginal = useGetProfile();
 
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
   const open = Boolean(anchorEl);
@@ -46,7 +46,7 @@ export default function Profile() {
               aria-expanded={open ? "true" : undefined}
             >
               <Avatar sx={{ width: 32, height: 32 }}>
-                {/* {getProfileOriginal.data?.data.name?.slice(0, 1)?.toUpperCase()} */}
+                {getProfileOriginal.data?.data.name?.slice(0, 1)?.toUpperCase()}
               </Avatar>
             </IconButton>
           </Tooltip>
@@ -87,7 +87,7 @@ export default function Profile() {
           >
             <MenuItem onClick={handleClose}>
               <Avatar />
-              {/* {getProfileOriginal.data?.data.name} */}
+              {getProfileOriginal.data?.data.name}
             </MenuItem>
             <Divider />
             <MenuItem onClick={handleClose}>

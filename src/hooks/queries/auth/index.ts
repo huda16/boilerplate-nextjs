@@ -7,7 +7,7 @@ import { ProfileType } from "@/validations/auth";
 export const useGetProfile = () => {
   return useQuery({
     queryKey: ["auth/getProfile"],
-    queryFn: () => fetchData<ProfileType>({ url: "/auth/profile" }),
+    queryFn: () => fetchData<ProfileType>({ url: "/authentications/me" }),
     staleTime: Infinity,
   });
 };
@@ -58,18 +58,6 @@ export const useGetMenu = () => {
             children: [],
           },
         ],
-      },
-      {
-        label: "Inbound",
-        icon: "keyboard_double_arrow_down",
-        href: "/inbound",
-        children: [],
-      },
-      {
-        label: "Outbound",
-        icon: "keyboard_double_arrow_up",
-        href: "/outbound",
-        children: [],
       },
     ],
   });

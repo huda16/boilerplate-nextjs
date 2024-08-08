@@ -1,27 +1,9 @@
 import { type NextAuthOptions } from "next-auth";
-import { JWT } from "next-auth/jwt";
 import CredentialsProvider from "next-auth/providers/credentials";
 
 import { AxiosError } from "axios";
 
 import axiosServer from "@/lib/axios-server";
-
-async function refreshToken(token: JWT): Promise<JWT> {
-  const body = {
-    refreshToken: token?.refreshToken,
-  };
-  console.log("NextAuth::BodyRefresh", body);
-  const response = await axiosServer.put("/authentications", body, {
-    isSkipAuth: true,
-  });
-
-  console.info("NextAuth::Refresh Token", response.data?.data);
-
-  return {
-    ...token,
-    ...response.data?.data,
-  };
-}
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -40,9 +22,37 @@ export const authOptions: NextAuthOptions = {
           label: "Recaptcha",
           type: "text",
         },
+        accessToken: {
+          label: "accessToken",
+          type: "text",
+        },
+        accessTokenExpiresAt: {
+          label: "accessTokenExpiresAt",
+          type: "number",
+        },
+        refreshToken: {
+          label: "refreshToken",
+          type: "text",
+        },
+        refreshTokenExpiresAt: {
+          label: "refreshTokenExpiresAt",
+          type: "number",
+        },
       },
       async authorize(credentials) {
         try {
+          if (
+            credentials?.accessToken &&
+            credentials?.accessTokenExpiresAt &&
+            credentials?.refreshToken &&
+            credentials?.refreshTokenExpiresAt
+          ) {
+            return {
+              ...credentials,
+              accessTokenExpiresAt: Number(credentials?.accessTokenExpiresAt),
+              refreshTokenExpiresAt: Number(credentials?.refreshTokenExpiresAt),
+            };
+          }
           if (!credentials?.username || !credentials?.password) return null;
           const { username, password } = credentials;
           const body = {
@@ -63,20 +73,12 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   callbacks: {
-    async jwt({ token, user, trigger }) {
-      if (trigger === "update") {
-        return await refreshToken(token);
-      }
-
+    async jwt({ token, user }) {
       if (user) {
         return { ...token, ...user };
       }
 
-      if (Date.now() / 1000 < token.accessTokenExpiresAt) {
-        return token;
-      }
-
-      return await refreshToken(token);
+      return token;
     },
     async session({ token, session }) {
       session.user = token.user;

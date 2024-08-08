@@ -1,9 +1,16 @@
-import { Session } from "next-auth";
-import { getSession } from "next-auth/react";
+import { getSession, signIn, signOut } from "next-auth/react";
 
-import axios, { AxiosError } from "axios";
+import axios, { AxiosRequestConfig } from "axios";
 
-let lastSession: Session | null = null;
+interface RetryQueueItem {
+  resolve: (_value?: any) => void;
+  reject: (_error?: any) => void;
+  config: AxiosRequestConfig;
+}
+
+const refreshAndRetryQueue: RetryQueueItem[] = [];
+
+let isRefreshing = false;
 
 const ApiClient = () => {
   const instance = axios.create({
@@ -11,56 +18,75 @@ const ApiClient = () => {
   });
 
   instance.interceptors.request.use(
-    async (request) => {
-      if (request.isSkipAuth || request.auth) {
-        return request;
+    async (config) => {
+      const session = await getSession();
+      if (session && session.accessToken) {
+        config.headers.Authorization = `Bearer ${session.accessToken}`;
       }
-
-      if (
-        lastSession === null ||
-        Date.now() / 1000 > lastSession.accessTokenExpiresAt
-      ) {
-        const session = await getSession({ broadcast: false });
-        lastSession = session;
-      }
-
-      if (lastSession) {
-        request.headers.Authorization = `Bearer ${lastSession.accessToken}`;
-      }
-
-      return request;
+      return config;
     },
-    (error) => {
-      console.error("AxiosInterceptors Request onRejected::", error);
-      throw error;
-    },
+    (error) => Promise.reject(error),
   );
 
   instance.interceptors.response.use(
     (response) => {
       return response;
     },
-    async (error: AxiosError) => {
+    async (error) => {
+      const originalRequest = error.config;
+
       if (error.response && error.response.status === 401) {
-        if (
-          lastSession === null ||
-          Date.now() / 1000 > lastSession.accessTokenExpiresAt
-        ) {
-          const session = await getSession({ broadcast: false });
-          lastSession = session;
-        }
+        if (!isRefreshing) {
+          isRefreshing = true;
+          const session = await getSession();
 
-        const config = error.config;
+          if (session) {
+            try {
+              const response = await instance.put(
+                "authentications",
+                {
+                  refreshToken: session.refreshToken,
+                },
+                { isSkipAuth: true },
+              );
 
-        if (config && lastSession) {
-          const bearer = `Bearer ${lastSession.accessToken}`;
-          config.headers.Authorization = bearer;
-          return axios.request(config);
-        } else {
-          console.error(
-            "AxiosInterceptors Response 401:: Error config is undefined",
-          );
+              await signIn("credentials", {
+                ...response.data?.data,
+                redirect: false,
+              });
+
+              instance.defaults.headers.common["Authorization"] =
+                `Bearer ${response.data?.data?.accessToken}`;
+
+              refreshAndRetryQueue.forEach(({ config, resolve, reject }) => {
+                instance
+                  .request(config)
+                  .then((response) => {
+                    resolve(response);
+                  })
+                  .catch((err) => {
+                    reject(err);
+                  });
+              });
+
+              refreshAndRetryQueue.length = 0;
+
+              return instance(originalRequest);
+            } catch (refreshError) {
+              signOut();
+              return Promise.reject(refreshError);
+            } finally {
+              isRefreshing = false;
+            }
+          }
         }
+        return new Promise<void>((resolve, reject) => {
+          refreshAndRetryQueue.push({
+            config: originalRequest,
+            resolve,
+            reject,
+          });
+        });
       }
       return Promise.reject(error);
     },

@@ -7,5 +7,9 @@ type SessionProviderProps = {
 };
 
 export function SessionProvider({ children }: SessionProviderProps) {
-  return <BaseSessionProvider>{children}</BaseSessionProvider>;
+  return (
+    <BaseSessionProvider refetchOnWindowFocus={false}>
+      {children}
+    </BaseSessionProvider>
+  );
 }
