@@ -59,6 +59,18 @@ export const useGetMenu = () => {
           },
         ],
       },
+      {
+        label: "Inbound",
+        icon: "keyboard_double_arrow_down",
+        href: "/inbound",
+        children: [],
+      },
+      {
+        label: "Outbound",
+        icon: "keyboard_double_arrow_up",
+        href: "/outbound",
+        children: [],
+      },
     ],
   });
 };

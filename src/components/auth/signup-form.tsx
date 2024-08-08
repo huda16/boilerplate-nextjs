@@ -18,7 +18,6 @@ import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import { Loader2 } from "lucide-react";
 // import { useSnackbar } from "notistack";
-import { useGoogleReCaptcha } from "react-google-recaptcha-v3";
 import { useForm } from "react-hook-form";
 
 import { Copyright } from "@/components/common/copyright";

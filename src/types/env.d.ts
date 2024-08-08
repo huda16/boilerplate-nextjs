@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 namespace NodeJS {
   interface ProcessEnv {
     NEXTAUTH_URL: string;

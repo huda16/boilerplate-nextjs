@@ -92,7 +92,7 @@ function RowActions({ id }: RowActionsProps) {
         <DialogContent>
           <DialogContentText>
             Are you sure you want to remove this user? This action cannot be
-            undone. {id}
+            undone.
           </DialogContentText>
         </DialogContent>
         <DialogActions>
@@ -150,7 +150,6 @@ export function DataTable() {
     pageSize: 10,
   });
 
-  const [isOpenDeleteDialog, setIsOpenDeleteDialog] = useState(false);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
 

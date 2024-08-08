@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 type FetchError = {
   message?: string;
   code?: number;

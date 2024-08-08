@@ -1,3 +1,19 @@
+import { Breadcrumbs, Grid, Stack, Typography } from "@mui/material";
+
+import { DataTable } from "@/components/home/data-table";
+
 export default function UserManagementsMenuItemsPage() {
-  return <div>UserManagementsMenuItemsPage</div>;
+  return (
+    <Stack gap={2}>
+      <Breadcrumbs separator="›" aria-label="breadcrumb">
+        <Typography color="inherit">User Managements</Typography>
+        <Typography color="text.primary">Menu Items</Typography>
+      </Breadcrumbs>
+      <Grid container spacing={3}>
+        <Grid item xs={12}>
+          <DataTable />
+        </Grid>
+      </Grid>
+    </Stack>
+  );
 }

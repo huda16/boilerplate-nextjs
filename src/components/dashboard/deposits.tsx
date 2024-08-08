@@ -14,7 +14,6 @@ export default function Deposits() {
       <Typography color="text.secondary" sx={{ flex: 1 }}>
         on 15 March, 2019
       </Typography>
-      <div>View balance</div>
     </React.Fragment>
   );
 }

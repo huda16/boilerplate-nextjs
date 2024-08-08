@@ -12,7 +12,7 @@ export function Copyright(props: any) {
     >
       Copyright &copy;
       <Link color="inherit" href="https://mui.com/">
-        Your Website
+        JNE
       </Link>{" "}
       {new Date().getFullYear()}
       {"."}

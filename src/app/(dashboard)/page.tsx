@@ -1,14 +1,13 @@
 import { Metadata } from "next";
 import dynamic from "next/dynamic";
 
-import { Grid, Paper } from "@mui/material";
+import { Breadcrumbs, Grid, Stack, Typography } from "@mui/material";
 
-// import Chart from "react-apexcharts";
-import { Copyright } from "@/components/common/copyright";
-import Deposits from "@/components/dashboard/deposits";
-import { DataTable } from "@/components/home/data-table";
+import { HighlightCard } from "@/components/ui/card";
 
-const Chart = dynamic(() => import("@/components/home/chart"), { ssr: false });
+const InboundOutboundChart = dynamic(() => import("@/components/home/chart"), {
+  ssr: false,
+});
 
 export const metadata: Metadata = {
   title: "Home",
@@ -16,37 +15,24 @@ export const metadata: Metadata = {
 
 export default async function HomePage() {
   return (
-    <>
+    <Stack gap={2}>
+      <Breadcrumbs separator="›" aria-label="breadcrumb">
+        <Typography color="text.primary">Dashboard</Typography>
+      </Breadcrumbs>
       <Grid container spacing={3}>
-        <Grid item xs={12} md={8} lg={9}>
-          <Paper
-            sx={{
-              p: 2,
-              display: "flex",
-              flexDirection: "column",
-              height: 240,
-            }}
-          >
-            <Chart />
-          </Paper>
+        <Grid item xs={12} sm={6} md={4}>
+          <HighlightCard title="Total Orders" value={123456789} />
         </Grid>
-        <Grid item xs={12} md={4} lg={3}>
-          <Paper
-            sx={{
-              p: 2,
-              display: "flex",
-              flexDirection: "column",
-              height: 240,
-            }}
-          >
-            <Deposits />
-          </Paper>
+        <Grid item xs={12} sm={6} md={4}>
+          <HighlightCard title="Total Orders Processed" value={987654321} />
+        </Grid>
+        <Grid item xs={12} sm={6} md={4}>
+          <HighlightCard title="Total Orders Unprocessed" value={456789123} />
         </Grid>
         <Grid item xs={12}>
-          <DataTable />
+          <InboundOutboundChart />
         </Grid>
       </Grid>
-      <Copyright sx={{ pt: 4 }} />
-    </>
+    </Stack>
   );
 }

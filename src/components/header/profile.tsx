@@ -4,7 +4,7 @@ import { useState } from "react";
 
 import { signIn, signOut, useSession } from "next-auth/react";
 
-import { Logout, PersonAdd, Settings } from "@mui/icons-material";
+import { Logout, Settings } from "@mui/icons-material";
 import {
   Avatar,
   Button,
@@ -17,7 +17,7 @@ import {
   Tooltip,
 } from "@mui/material";
 
-import { useGetProfile } from "@/hooks/queries/auth";
+// import { useGetProfile } from "@/hooks/queries/auth";
 
 export default function Profile() {
   const { status } = useSession();

@@ -4,7 +4,7 @@ import { createJSONStorage, persist } from "zustand/middleware";
 interface DrawerState {
   open: boolean;
   toggleDrawer: () => void;
-  setOpen: (open: boolean) => void;
+  setOpen: (_open: boolean) => void;
 }
 
 export const useDrawerStore = create<DrawerState>()(
