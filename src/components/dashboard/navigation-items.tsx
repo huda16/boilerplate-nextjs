@@ -46,7 +46,7 @@ export const NavigationItems = () => {
               <Icon>{item.icon}</Icon>
             </ListItemIcon>
             <ListItemText primary={item.label} />
-            {item.children.length > 0 ? (
+            {item.children?.length > 0 ? (
               open[itemKey] ? (
                 <ExpandLess />
               ) : (
@@ -54,7 +54,7 @@ export const NavigationItems = () => {
               )
             ) : null}
           </ListItemButton>
-          {item.children.length > 0 && (
+          {item.children?.length > 0 && (
             <Collapse in={open[itemKey]} timeout="auto" unmountOnExit>
               <List component="div" disablePadding>
                 {renderMenuItems(item.children, itemKey, level + 1)}
@@ -66,5 +66,5 @@ export const NavigationItems = () => {
     });
   };
 
-  return <List>{renderMenuItems(getMenu.data)}</List>;
+  return <List>{renderMenuItems(getMenu.data as MenuType[])}</List>;
 };
