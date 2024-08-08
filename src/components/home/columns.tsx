@@ -12,7 +12,7 @@ export const columns: MRT_ColumnDef<ProfileType>[] = [
   {
     accessorKey: "username",
     filterVariant: "autocomplete",
-    header: "Name",
+    header: "Username",
     size: 300,
   },
   {

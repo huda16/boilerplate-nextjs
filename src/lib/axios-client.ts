@@ -20,7 +20,7 @@ const ApiClient = () => {
         lastSession === null ||
         Date.now() / 1000 > lastSession.accessTokenExpiresAt
       ) {
-        const session = await getSession();
+        const session = await getSession({ broadcast: false });
         lastSession = session;
       }
 
@@ -46,7 +46,7 @@ const ApiClient = () => {
           lastSession === null ||
           Date.now() / 1000 > lastSession.accessTokenExpiresAt
         ) {
-          const session = await getSession();
+          const session = await getSession({ broadcast: false });
           lastSession = session;
         }
 

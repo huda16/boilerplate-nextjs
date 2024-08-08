@@ -21,7 +21,7 @@ import { useGetProfile } from "@/hooks/queries/auth";
 
 export default function Profile() {
   const { status } = useSession();
-  const getProfileOriginal = useGetProfile();
+  // const getProfileOriginal = useGetProfile();
 
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
   const open = Boolean(anchorEl);
@@ -46,7 +46,7 @@ export default function Profile() {
               aria-expanded={open ? "true" : undefined}
             >
               <Avatar sx={{ width: 32, height: 32 }}>
-                {getProfileOriginal.data?.data.name?.slice(0, 1)?.toUpperCase()}
+                {/* {getProfileOriginal.data?.data.name?.slice(0, 1)?.toUpperCase()} */}
               </Avatar>
             </IconButton>
           </Tooltip>
@@ -86,7 +86,8 @@ export default function Profile() {
             anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
           >
             <MenuItem onClick={handleClose}>
-              <Avatar /> {getProfileOriginal.data?.data.name}
+              <Avatar />
+              {/* {getProfileOriginal.data?.data.name} */}
             </MenuItem>
             <Divider />
             <MenuItem onClick={handleClose}>

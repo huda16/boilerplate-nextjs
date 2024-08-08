@@ -30,7 +30,7 @@ type SignInFormProps = {
 };
 
 export function SignInForm({ searchParams }: SignInFormProps) {
-  const { executeRecaptcha } = useGoogleReCaptcha();
+  // const { executeRecaptcha } = useGoogleReCaptcha();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isShowPassword, setIsShowPassword] = useState<boolean>(false);
 
@@ -66,20 +66,20 @@ export function SignInForm({ searchParams }: SignInFormProps) {
   });
 
   const onSubmit = async ({ username, password }: SignInFormType) => {
-    if (!executeRecaptcha) {
-      return setError("root", {
-        message:
-          "Failed to connect to Google ReCAPTCHA, please refresh the page",
-      });
-    }
+    // if (!executeRecaptcha) {
+    //   return setError("root", {
+    //     message:
+    //       "Failed to connect to Google ReCAPTCHA, please refresh the page",
+    //   });
+    // }
 
     setIsLoading(true);
 
-    const recaptcha = await executeRecaptcha();
+    // const recaptcha = await executeRecaptcha();
     const auth = await signIn("credentials", {
       username,
       password,
-      recaptcha,
+      // recaptcha,
       redirect: false,
     });
 

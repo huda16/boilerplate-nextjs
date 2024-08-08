@@ -15,10 +15,7 @@ async function refreshToken(token: JWT): Promise<JWT> {
     isSkipAuth: true,
   });
 
-  console.info(
-    "NextAuth::Refresh Token",
-    response.data?.data?.accessToken?.substr(-5),
-  );
+  console.info("NextAuth::Refresh Token", response.data?.data);
 
   return {
     ...token,
@@ -46,13 +43,8 @@ export const authOptions: NextAuthOptions = {
       },
       async authorize(credentials) {
         try {
-          if (
-            !credentials?.username ||
-            !credentials?.password ||
-            !credentials?.recaptcha
-          )
-            return null;
-          const { username, password, recaptcha } = credentials;
+          if (!credentials?.username || !credentials?.password) return null;
+          const { username, password } = credentials;
           const body = {
             username,
             password,
@@ -98,5 +90,8 @@ export const authOptions: NextAuthOptions = {
   },
   pages: {
     signIn: "/signin",
+  },
+  session: {
+    strategy: "jwt",
   },
 };

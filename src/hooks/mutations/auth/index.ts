@@ -10,7 +10,7 @@ export const useSignUp = () => {
     mutationFn: (data: SignUpFormType) => {
       return fetchData<{}>({
         method: "POST",
-        url: "/auth/signup",
+        url: "/users",
         data: { ...data, confirmationPassword: data.confirm_password },
       });
     },

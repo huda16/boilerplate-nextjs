@@ -1,6 +1,6 @@
 "use client";
 
-import { MouseEvent, useState } from "react";
+import { MouseEvent, useEffect, useState } from "react";
 
 import { AccountCircle, Send } from "@mui/icons-material";
 import RefreshIcon from "@mui/icons-material/Refresh";
@@ -25,6 +25,7 @@ import {
   MRT_ColumnFiltersState,
   MRT_GlobalFilterTextField,
   MRT_PaginationState,
+  MRT_RowSelectionState,
   MRT_ShowHideColumnsButton,
   MRT_SortingState,
   MRT_ToggleDensePaddingButton,
@@ -36,7 +37,10 @@ import {
 import { useSnackbar } from "notistack";
 import * as XLSX from "xlsx";
 
-import { useDeleteUser } from "@/hooks/mutations/user-managements";
+import {
+  useDeleteUser,
+  useRestoreUser,
+} from "@/hooks/mutations/user-managements";
 import { useGetUsers } from "@/hooks/queries/user-managements";
 
 import { convertFEParamsToAPIParams } from "@/utils/helpers";
@@ -44,9 +48,92 @@ import { convertFEParamsToAPIParams } from "@/utils/helpers";
 import { Icon } from "../ui/icon";
 import { columns } from "./columns";
 
+type RowActionsProps = {
+  id: number;
+};
+
+function RowActions({ id }: RowActionsProps) {
+  const { enqueueSnackbar } = useSnackbar();
+
+  const deleteUser = useDeleteUser();
+
+  const [isOpenDeleteDialog, setIsOpenDeleteDialog] = useState(false);
+
+  return (
+    <Box sx={{ display: "flex", gap: "0" }}>
+      <Tooltip title="Edit">
+        <IconButton size="small" href={`/user-managements/users/${id}?edit=1`}>
+          <Icon>edit</Icon>
+        </IconButton>
+      </Tooltip>
+      <Tooltip title="View">
+        <IconButton size="small" href={`/user-managements/users/${id}`}>
+          <Icon>visibility</Icon>
+        </IconButton>
+      </Tooltip>
+      <Tooltip title="Delete">
+        <IconButton
+          size="small"
+          color="error"
+          onClick={() => {
+            setIsOpenDeleteDialog((prev) => !prev);
+          }}
+        >
+          <Icon>delete</Icon>
+        </IconButton>
+      </Tooltip>
+      <Dialog
+        open={isOpenDeleteDialog}
+        onClose={() => setIsOpenDeleteDialog((prev) => !prev)}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle>Delete user?</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Are you sure you want to remove this user? This action cannot be
+            undone. {id}
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setIsOpenDeleteDialog((prev) => !prev)}>
+            Cancel
+          </Button>
+          <Button
+            onClick={() => {
+              deleteUser.mutate(
+                { id },
+                {
+                  onSuccess: ({ data }) => {
+                    enqueueSnackbar(data, {
+                      variant: "success",
+                    });
+                  },
+                  onError: (error) => {
+                    enqueueSnackbar(error.message, { variant: "error" });
+                  },
+                  onSettled: () => {
+                    setIsOpenDeleteDialog((prev) => !prev);
+                  },
+                },
+              );
+            }}
+            autoFocus
+          >
+            Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </Box>
+  );
+}
+
 export function DataTable() {
   const { enqueueSnackbar } = useSnackbar();
 
+  const [isTrash, setIsTrash] = useState(false);
+
+  const [rowSelection, setRowSelection] = useState<MRT_RowSelectionState>({});
   const [columnFilters, setColumnFilters] = useState<MRT_ColumnFiltersState>(
     [],
   );
@@ -101,17 +188,19 @@ export function DataTable() {
     handleClose();
   };
 
-  const getUsers = useGetUsers(
-    convertFEParamsToAPIParams({
+  const getUsers = useGetUsers({
+    ...convertFEParamsToAPIParams({
       pagination,
       columnFilterFns,
       columnFilters,
       sorting,
       globalFilter,
     }),
-  );
+    trash: isTrash,
+  });
 
   const deleteUser = useDeleteUser();
+  const restoreUser = useRestoreUser();
 
   const table = useMaterialReactTable({
     columns,
@@ -131,6 +220,7 @@ export function DataTable() {
       sorting,
       pagination,
       columnFilterFns,
+      rowSelection,
       isLoading: getUsers.isFetching,
     },
     enableColumnFilterModes: true,
@@ -138,7 +228,7 @@ export function DataTable() {
     enableGrouping: true,
     enableColumnPinning: true,
     enableFacetedValues: true,
-    enableRowActions: true,
+    enableRowActions: !isTrash,
     enableRowSelection: true,
     paginationDisplayMode: "pages",
     positionToolbarAlertBanner: "bottom",
@@ -147,82 +237,47 @@ export function DataTable() {
       variant: "outlined",
     },
     muiPaginationProps: {
-      rowsPerPageOptions: [5, 10, 20, 30, 100],
+      // rowsPerPageOptions: [5, 10, 20, 30, 100],
+      rowsPerPageOptions: [
+        {
+          label: "5",
+          value: 5,
+        },
+        {
+          label: "10",
+          value: 10,
+        },
+        {
+          label: "20",
+          value: 20,
+        },
+        {
+          label: "30",
+          value: 30,
+        },
+        {
+          label: "100",
+          value: 100,
+        },
+        {
+          label: "All",
+          value: Number.MAX_SAFE_INTEGER,
+          // value: Number(getUsers.data?.meta.total),
+        },
+      ],
     },
     manualFiltering: true,
     manualSorting: true,
     manualPagination: true,
     rowCount: getUsers.data?.meta.total,
+    getRowId: (row) => row.id?.toString(),
     onColumnFiltersChange: setColumnFilters,
     onGlobalFilterChange: setGlobalFilter,
     onSortingChange: setSorting,
     onPaginationChange: setPagination,
     onColumnFilterFnsChange: setColumnFilterFns,
-    renderRowActions: ({ row, table }) => (
-      <Box sx={{ display: "flex", gap: "1rem" }}>
-        <Tooltip title="Edit">
-          <IconButton
-            size="small"
-            href={`/user-managements/users/${row.original.id}`}
-          >
-            <Icon>edit</Icon>
-          </IconButton>
-        </Tooltip>
-        <Tooltip title="Delete">
-          <IconButton
-            size="small"
-            color="error"
-            onClick={() => {
-              setIsOpenDeleteDialog((prev) => !prev);
-            }}
-          >
-            <Icon>delete</Icon>
-          </IconButton>
-        </Tooltip>
-        <Dialog
-          open={isOpenDeleteDialog}
-          onClose={() => setIsOpenDeleteDialog((prev) => !prev)}
-          aria-labelledby="alert-dialog-title"
-          aria-describedby="alert-dialog-description"
-        >
-          <DialogTitle>Delete user?</DialogTitle>
-          <DialogContent>
-            <DialogContentText>
-              Are you sure you want to remove this user? This action cannot be
-              undone.
-            </DialogContentText>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={() => setIsOpenDeleteDialog((prev) => !prev)}>
-              Cancel
-            </Button>
-            <Button
-              onClick={() => {
-                deleteUser.mutate(
-                  { id: row.original.id },
-                  {
-                    onSuccess: () => {
-                      enqueueSnackbar("Success delete user", {
-                        variant: "success",
-                      });
-                    },
-                    onError: (error) => {
-                      enqueueSnackbar(error.message, { variant: "error" });
-                    },
-                    onSettled: () => {
-                      setIsOpenDeleteDialog((prev) => !prev);
-                    },
-                  },
-                );
-              }}
-              autoFocus
-            >
-              Delete
-            </Button>
-          </DialogActions>
-        </Dialog>
-      </Box>
-    ),
+    onRowSelectionChange: setRowSelection,
+    renderRowActions: ({ row }) => <RowActions id={row.original.id} />,
     renderRowActionMenuItems: ({ closeMenu }) => [
       <MenuItem
         key={0}
@@ -262,14 +317,75 @@ export function DataTable() {
             justifyContent: "space-between",
           })}
         >
-          <Button
-            variant="contained"
-            href="/user-managements/users/create"
-            startIcon={<Icon>add</Icon>}
+          {Object.keys(rowSelection).length ? (
+            isTrash ? (
+              <Tooltip arrow title="Bulk Restore">
+                <IconButton
+                  id="bulk-restore-button"
+                  aria-haspopup="true"
+                  onClick={() => {
+                    Object.keys(rowSelection)
+                      .map(Number)
+                      .forEach((id) => {
+                        restoreUser.mutate(
+                          { id },
+                          {
+                            onSuccess: ({ data }) => {
+                              enqueueSnackbar(data, { variant: "success" });
+                              setRowSelection({});
+                            },
+                          },
+                        );
+                      });
+                  }}
+                >
+                  <Icon>settings_backup_restore</Icon>
+                </IconButton>
+              </Tooltip>
+            ) : (
+              <Tooltip arrow title="Bulk Delete">
+                <IconButton
+                  id="bulk-delete-button"
+                  aria-haspopup="true"
+                  onClick={() => {
+                    Object.keys(rowSelection)
+                      .map(Number)
+                      .forEach((id) => {
+                        deleteUser.mutate(
+                          { id },
+                          {
+                            onSuccess: ({ data }) => {
+                              enqueueSnackbar(data, { variant: "success" });
+                              setRowSelection({});
+                            },
+                          },
+                        );
+                      });
+                  }}
+                >
+                  <Icon>delete</Icon>
+                </IconButton>
+              </Tooltip>
+            )
+          ) : null}
+          {/* <pre>
+            {JSON.stringify(Object.keys(rowSelection).map(Number), null, 2)}
+          </pre> */}
+          <Box
+            sx={{
+              display: "flex",
+              gap: "0.5rem",
+              alignItems: "center",
+              marginLeft: "auto",
+            }}
           >
-            Create
-          </Button>
-          <Box sx={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
+            <Button
+              variant="contained"
+              href="/user-managements/users/create"
+              startIcon={<Icon>add</Icon>}
+            >
+              Create
+            </Button>
             <MRT_GlobalFilterTextField table={table} />
             <MRT_ToggleFiltersButton table={table} />
             <MRT_ShowHideColumnsButton table={table} />
@@ -322,11 +438,27 @@ export function DataTable() {
                 Export as XLSX
               </MenuItem>
             </Menu>
+            <Tooltip arrow title="Toggle trash">
+              <IconButton
+                id="trash-button"
+                // aria-controls={open ? "trash-menu" : undefined}
+                aria-haspopup="true"
+                // aria-expanded={open ? "true" : undefined}
+                // onClick={handleClickExport}
+                onClick={() => setIsTrash((prev) => !prev)}
+              >
+                {isTrash ? <Icon>arrow_back</Icon> : <Icon>recycling</Icon>}
+              </IconButton>
+            </Tooltip>
           </Box>
         </Box>
       );
     },
   });
+
+  useEffect(() => {
+    setRowSelection({});
+  }, [isTrash]);
 
   return <MaterialReactTable table={table} />;
 }

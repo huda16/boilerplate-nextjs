@@ -1,9 +1,7 @@
 import { Metadata } from "next";
-import { getServerSession } from "next-auth";
 import dynamic from "next/dynamic";
 
-import { authOptions } from "@/auth-options";
-import { Box, Button, Container, Grid, Paper, Toolbar } from "@mui/material";
+import { Grid, Paper } from "@mui/material";
 
 // import Chart from "react-apexcharts";
 import { Copyright } from "@/components/common/copyright";
@@ -17,8 +15,6 @@ export const metadata: Metadata = {
 };
 
 export default async function HomePage() {
-  const session = await getServerSession(authOptions);
-
   return (
     <>
       <Grid container spacing={3}>

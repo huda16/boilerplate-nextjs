@@ -28,7 +28,7 @@ import { useSignUp } from "@/hooks/mutations/auth";
 import { SignUpFormType, signUpFormSchema } from "@/validations/auth";
 
 export function SignUpForm() {
-  const { executeRecaptcha } = useGoogleReCaptcha();
+  // const { executeRecaptcha } = useGoogleReCaptcha();
   const router = useRouter();
   // const { enqueueSnackbar } = useSnackbar();
 
@@ -57,16 +57,16 @@ export function SignUpForm() {
   });
 
   const onSubmit = async (data: SignUpFormType) => {
-    if (!executeRecaptcha) {
-      return setError("root", {
-        message:
-          "Failed to connect to Google ReCAPTCHA, please refresh the page",
-      });
-    }
+    // if (!executeRecaptcha) {
+    //   return setError("root", {
+    //     message:
+    //       "Failed to connect to Google ReCAPTCHA, please refresh the page",
+    //   });
+    // }
 
     setIsLoading(true);
 
-    const recaptcha = await executeRecaptcha();
+    // const recaptcha = await executeRecaptcha();
     console.log("data@@", data);
     signUp.mutate(data, {
       onSuccess: () => {

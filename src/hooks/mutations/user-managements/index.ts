@@ -48,9 +48,23 @@ export const useUpdateUser = () => {
 export const useDeleteUser = () => {
   return useMutation({
     mutationFn: ({ id }: { id: number }) => {
-      return fetchData<UserManagementsUsersType>({
+      return fetchData<string>({
         url: `/users/${id}`,
         method: "DELETE",
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["profile/getUsers"] });
+    },
+  });
+};
+
+export const useRestoreUser = () => {
+  return useMutation({
+    mutationFn: ({ id }: { id: number }) => {
+      return fetchData<string>({
+        url: `/users/${id}/restore`,
+        method: "PUT",
       });
     },
     onSuccess: () => {
