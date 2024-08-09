@@ -127,7 +127,7 @@ export const useGetMenu = () => {
           {
             label: "Payments",
             icon: "payment",
-            href: "/transactions/paryments",
+            href: "/transactions/payments",
           },
         ],
       },
