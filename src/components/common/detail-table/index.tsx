@@ -14,17 +14,15 @@ import {
   Typography,
 } from "@mui/material";
 
-import { useGetUser } from "@/hooks/queries/user-managements";
+import { Form } from "@/components/common/form";
 
-import UserForm from "./form";
+import { useGetUser } from "@/hooks/react-query/user-managements";
 
 type UserManagementsUserDetailProps = {
   isEdit: boolean;
 };
 
-export default function UserManagementsUserDetail({
-  isEdit,
-}: UserManagementsUserDetailProps) {
+export function DetailTable({ isEdit }: UserManagementsUserDetailProps) {
   const params = useParams();
   const getUser = useGetUser(Number(params.id));
 
@@ -35,7 +33,7 @@ export default function UserManagementsUserDetail({
   if (isEdit) {
     return (
       <>
-        <UserForm initialData={getUser.data?.data} />
+        <Form initialData={getUser.data?.data} />
       </>
     );
   }

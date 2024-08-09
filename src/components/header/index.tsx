@@ -17,9 +17,9 @@ import {
   Tooltip,
 } from "@mui/material";
 
-import { useGetProfile } from "@/hooks/queries/auth";
+import { useGetProfile } from "@/hooks/react-query/auth";
 
-export default function Profile() {
+export function Header() {
   const { status } = useSession();
   const getProfileOriginal = useGetProfile();
 
@@ -96,7 +96,7 @@ export default function Profile() {
               </ListItemIcon>
               Settings
             </MenuItem>
-            <MenuItem onClick={() => signOut()}>
+            <MenuItem onClick={() => signOut({ callbackUrl: "/signedout" })}>
               <ListItemIcon>
                 <Logout fontSize="small" />
               </ListItemIcon>

@@ -3,7 +3,7 @@
 import { Paper } from "@mui/material";
 import ReactApexChart from "react-apexcharts";
 
-export default function InboundOutboundChart() {
+export default function Chart() {
   return (
     <Paper sx={{ p: 2, height: 480 }}>
       <ReactApexChart

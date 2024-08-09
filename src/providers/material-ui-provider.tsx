@@ -12,9 +12,7 @@ type MaterialUiProviderProps = {
   children: React.ReactNode;
 };
 
-export default function MaterialUiProvider({
-  children,
-}: MaterialUiProviderProps) {
+export function MaterialUiProvider({ children }: MaterialUiProviderProps) {
   return (
     <ThemeProvider theme={theme}>
       <LocalizationProvider dateAdapter={AdapterDayjs}>

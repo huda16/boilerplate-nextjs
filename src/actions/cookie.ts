@@ -2,7 +2,7 @@
 
 import { cookies } from "next/headers";
 
-export async function testCookie() {
+export async function testSetCookie() {
   cookies().set({
     name: "cookiesName",
     value: "cookiesValue",

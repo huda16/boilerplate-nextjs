@@ -1,8 +1,8 @@
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 
 import { fetchData } from "@/utils/fetcher";
 
-import { ProfileType } from "@/validations/auth";
+import { ProfileType, SignUpFormType } from "@/validations/auth";
 
 export const useGetProfile = () => {
   return useQuery({
@@ -15,7 +15,7 @@ export const useGetProfile = () => {
 export const useGetMenu = () => {
   return useQuery({
     queryKey: ["auth/getMenu"],
-    // queryFn: () => fetchData<ProfileType>({ url: "/auth/profile" }),
+    // queryFn: () => fetchData<ProfileType>({ url: "/authentications/menu" }),
     initialData: [
       {
         label: "Dashboard",
@@ -132,5 +132,18 @@ export const useGetMenu = () => {
         ],
       },
     ],
+  });
+};
+
+export const useSignUp = () => {
+  return useMutation({
+    mutationKey: ["auth/signUp"],
+    mutationFn: ({ data }: { data: SignUpFormType }) => {
+      return fetchData<{}>({
+        method: "POST",
+        url: "/users",
+        data: { ...data, confirmationPassword: data.confirm_password },
+      });
+    },
   });
 };

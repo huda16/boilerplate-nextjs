@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 
-import MaterialUiProvider from "@/providers/material-ui-provider";
-import ReactQueryProvider from "@/providers/react-query-provider";
+import { MaterialUiProvider } from "@/providers/material-ui-provider";
+import { ReactQueryProvider } from "@/providers/react-query-provider";
 import { SessionProvider } from "@/providers/session-provider";
 import { SnackbarProvider } from "@/providers/snackbar-provider";
 

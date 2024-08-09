@@ -28,8 +28,6 @@ type CommonResponse<R> = {
   meta: Meta;
 };
 
-// type CommonResponse<R> = R;
-
 export const fetchData = async <R>({
   url,
   method,

@@ -18,8 +18,8 @@ import {
   styled,
 } from "@mui/material";
 
-import { NavigationItems } from "@/components/dashboard/navigation-items";
-import Profile from "@/components/header/profile";
+import { Header } from "@/components/header";
+import { SidebarNavigation } from "@/components/navigation/sidebar-navigation";
 
 type DashboardLayoutProps = {
   children: React.ReactNode;
@@ -69,8 +69,7 @@ const Drawer = styled(MuiDrawer, {
   },
 }));
 
-export default function DashboardLayout({ children }: DashboardLayoutProps) {
-  // const [open, setOpen] = useState(true);
+export function DashboardLayout({ children }: DashboardLayoutProps) {
   const { open, toggleDrawer } = useDrawerStore();
 
   return (
@@ -108,7 +107,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                   <NotificationsIcon />
                 </Badge>
               </IconButton>
-              <Profile />
+              <Header />
             </Stack>
           </Toolbar>
         </AppBar>
@@ -122,7 +121,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
             }}
           ></Toolbar>
           <List component="nav" style={{ marginTop: "1rem" }}>
-            <NavigationItems />
+            <SidebarNavigation />
           </List>
         </Drawer>
         <Box

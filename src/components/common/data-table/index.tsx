@@ -41,12 +41,12 @@ import * as XLSX from "xlsx";
 import {
   useDeleteUser,
   useRestoreUser,
-} from "@/hooks/mutations/user-managements";
-import { useGetUsers } from "@/hooks/queries/user-managements";
+} from "@/hooks/react-query/user-managements";
+import { useGetUsers } from "@/hooks/react-query/user-managements";
 
 import { convertFEParamsToAPIParams } from "@/utils/helpers";
 
-import { Icon } from "../ui/icon";
+import { Icon } from "../../ui/icon";
 import { columns } from "./columns";
 
 type RowActionsProps = {
@@ -237,7 +237,6 @@ export function DataTable() {
       variant: "outlined",
     },
     muiPaginationProps: {
-      // rowsPerPageOptions: [5, 10, 20, 30, 100],
       rowsPerPageOptions: [
         {
           label: "5",
@@ -368,9 +367,6 @@ export function DataTable() {
               </Tooltip>
             )
           ) : null}
-          {/* <pre>
-            {JSON.stringify(Object.keys(rowSelection).map(Number), null, 2)}
-          </pre> */}
           <Box
             sx={{
               display: "flex",
@@ -442,10 +438,7 @@ export function DataTable() {
             <Tooltip arrow title="Toggle trash">
               <IconButton
                 id="trash-button"
-                // aria-controls={open ? "trash-menu" : undefined}
                 aria-haspopup="true"
-                // aria-expanded={open ? "true" : undefined}
-                // onClick={handleClickExport}
                 onClick={() => setIsTrash((prev) => !prev)}
               >
                 {isTrash ? <Icon>arrow_back</Icon> : <Icon>recycling</Icon>}

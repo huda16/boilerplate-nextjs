@@ -1,6 +1,6 @@
 import { Breadcrumbs, Grid, Link, Stack, Typography } from "@mui/material";
 
-import UserForm from "@/components/home/form";
+import { Form } from "@/components/common/form";
 
 export default function UserManagementsUsersCreatePage() {
   return (
@@ -14,7 +14,7 @@ export default function UserManagementsUsersCreatePage() {
       </Breadcrumbs>
       <Grid container spacing={3}>
         <Grid item xs={12}>
-          <UserForm />
+          <Form />
         </Grid>
       </Grid>
     </Stack>

@@ -3,9 +3,9 @@ import dynamic from "next/dynamic";
 
 import { Breadcrumbs, Grid, Stack, Typography } from "@mui/material";
 
-import { HighlightCard } from "@/components/ui/card";
+import { HighlightCard } from "@/components/common/card/highlight-card";
 
-const InboundOutboundChart = dynamic(() => import("@/components/home/chart"), {
+const Chart = dynamic(() => import("@/components/common/chart"), {
   ssr: false,
 });
 
@@ -30,7 +30,7 @@ export default async function HomePage() {
           <HighlightCard title="Total Orders Unprocessed" value={456789123} />
         </Grid>
         <Grid item xs={12}>
-          <InboundOutboundChart />
+          <Chart />
         </Grid>
       </Grid>
     </Stack>

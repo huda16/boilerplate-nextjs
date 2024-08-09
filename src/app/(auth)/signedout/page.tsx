@@ -1,6 +1,19 @@
+import { Metadata } from "next";
+import { getServerSession } from "next-auth";
+import { redirect } from "next/navigation";
+
+import { authOptions } from "@/auth-options";
 import { Box, Button, Container, Typography } from "@mui/material";
 
-export default function SignedOutPage() {
+export const metadata: Metadata = {
+  title: "Signed Out",
+};
+
+export default async function SignedOutPage() {
+  const session = await getServerSession(authOptions);
+
+  if (session) redirect("/");
+
   return (
     <Container component="main" maxWidth="xs">
       <Box

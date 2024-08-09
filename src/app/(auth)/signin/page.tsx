@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 
 import { authOptions } from "@/auth-options";
 
-import { SignInForm } from "@/components/auth/login-form";
+import { SignIn } from "@/components/auth/signin";
 
 export const metadata: Metadata = {
   title: "Sign In",
@@ -19,5 +19,5 @@ export default async function SignInPage({ searchParams }: SignInPageProps) {
 
   if (session) redirect("/");
 
-  return <SignInForm searchParams={searchParams} />;
+  return <SignIn searchParams={searchParams} />;
 }

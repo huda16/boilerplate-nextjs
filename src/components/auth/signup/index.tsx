@@ -2,114 +2,91 @@
 
 import { useState } from "react";
 
-import { useParams, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
-import {
-  Box,
-  Button,
-  IconButton,
-  InputAdornment,
-  Paper,
-  TextField,
-  Typography,
-} from "@mui/material";
+import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
+import { IconButton, InputAdornment } from "@mui/material";
+import Avatar from "@mui/material/Avatar";
+import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
+import Grid from "@mui/material/Grid";
+import Link from "@mui/material/Link";
+import Paper from "@mui/material/Paper";
+import TextField from "@mui/material/TextField";
+import Typography from "@mui/material/Typography";
 import { Loader2 } from "lucide-react";
 import { useSnackbar } from "notistack";
 import { useForm } from "react-hook-form";
 
-import {
-  useCreateUser,
-  useUpdateUser,
-} from "@/hooks/mutations/user-managements";
+import { Copyright } from "@/components/common/copyright";
 
-import {
-  UserManagementsUsersType,
-  userManagementsUsersSchema,
-} from "@/validations/user-managements";
+import { useSignUp } from "@/hooks/react-query/auth";
 
-type UserFormProps = {
-  initialData?: UserManagementsUsersType;
-};
+import { SignUpFormType, signUpFormSchema } from "@/validations/auth";
 
-export default function UserForm({ initialData }: UserFormProps) {
+export function SignUp() {
   const router = useRouter();
-  const params = useParams();
   const { enqueueSnackbar } = useSnackbar();
-  const createUser = useCreateUser();
-  const updateUser = useUpdateUser();
+
+  const signUp = useSignUp();
 
   const [isShowPassword, setIsShowPassword] = useState<boolean>(false);
   const [isShowConfirmPassword, setIsShowConfirmPassword] =
     useState<boolean>(false);
 
-  const isLoading = createUser.isPending || updateUser.isPending;
-
   const {
     register,
     handleSubmit,
+    setError,
     formState: { errors },
-  } = useForm<UserManagementsUsersType>({
-    resolver: zodResolver(userManagementsUsersSchema),
+  } = useForm<SignUpFormType>({
+    resolver: zodResolver(signUpFormSchema),
     mode: "onChange",
     defaultValues: {
-      username: initialData?.username ?? "",
-      email: initialData?.email ?? "",
-      password: initialData?.password ?? "",
-      confirm_password: initialData?.password ?? "",
-      name: initialData?.name ?? "",
+      name: "",
+      username: "",
+      email: "",
+      password: "",
+      confirm_password: "",
     },
   });
-  const onSubmit = async (data: UserManagementsUsersType) => {
-    console.log("data@@", data);
-    if (initialData) {
-      updateUser.mutate(
-        { id: Number(params.id), data },
-        {
-          onSuccess: () => {
-            enqueueSnackbar("Success update user", { variant: "success" });
-            router.back();
-          },
-          onError: (error) => {
-            enqueueSnackbar(error.message, { variant: "error" });
-          },
+
+  const onSubmit = async (data: SignUpFormType) => {
+    signUp.mutate(
+      { data },
+      {
+        onSuccess: () => {
+          enqueueSnackbar("Sign up successfully", { variant: "success" });
+          router.push("/signin");
         },
-      );
-    } else {
-      createUser.mutate(
-        { data },
-        {
-          onSuccess: () => {
-            enqueueSnackbar("Success create user", { variant: "success" });
-            router.back();
-          },
-          onError: (error) => {
-            enqueueSnackbar(error.message, { variant: "error" });
-          },
+        onError: (error) => {
+          setError("root", {
+            message:
+              error.message ?? "Something went wrong. Please try again later.",
+          });
         },
-      );
-    }
+      },
+    );
   };
 
   return (
-    <Paper
-      sx={{
-        p: 2,
-        display: "flex",
-        flexDirection: "column",
-      }}
-    >
+    <Grid item xs={12} sm={8} md={5} component={Paper} elevation={6} square>
       <Box
         sx={{
-          mx: 24,
+          my: 12,
+          mx: 12,
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
         }}
       >
+        <Avatar sx={{ m: 1, bgcolor: "secondary.main" }}>
+          <LockOutlinedIcon />
+        </Avatar>
         <Typography component="h1" variant="h5">
-          {initialData ? "Edit" : "Create"} User
+          Sign up
         </Typography>
         <Box
           component="form"
@@ -124,7 +101,7 @@ export default function UserForm({ initialData }: UserFormProps) {
             id="username"
             label="Username"
             autoComplete="off"
-            disabled={isLoading}
+            disabled={signUp.isPending}
             size="small"
             autoFocus
             {...register("username")}
@@ -138,7 +115,7 @@ export default function UserForm({ initialData }: UserFormProps) {
             id="email"
             label="Email"
             autoComplete="off"
-            disabled={isLoading}
+            disabled={signUp.isPending}
             size="small"
             {...register("email")}
             error={!!errors.email}
@@ -202,7 +179,7 @@ export default function UserForm({ initialData }: UserFormProps) {
             id="name"
             label="Name"
             autoComplete="off"
-            disabled={isLoading}
+            disabled={signUp.isPending}
             size="small"
             {...register("name")}
             error={!!errors.name}
@@ -218,13 +195,23 @@ export default function UserForm({ initialData }: UserFormProps) {
             fullWidth
             variant="contained"
             sx={{ mt: 3, mb: 2 }}
-            disabled={isLoading}
+            disabled={signUp.isPending}
           >
-            {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            Submit
+            {signUp.isPending && (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            )}
+            Sign Up
           </Button>
+          <Grid container justifyContent="flex-end">
+            <Grid item>
+              <Link href="/signin" variant="body2">
+                Already have an account? Sign in
+              </Link>
+            </Grid>
+          </Grid>
+          <Copyright sx={{ mt: 5 }} />
         </Box>
       </Box>
-    </Paper>
+    </Grid>
   );
 }

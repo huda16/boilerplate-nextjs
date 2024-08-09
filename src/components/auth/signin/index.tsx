@@ -1,10 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import { signIn } from "next-auth/react";
 
-import { testGetCookie } from "@/actions/cookie";
+// import { testGetCookie } from "@/actions/cookie";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
@@ -28,27 +28,26 @@ type SignInFormProps = {
   searchParams: { [key: string]: string | string[] | undefined };
 };
 
-export function SignInForm({ searchParams }: SignInFormProps) {
-  // const { executeRecaptcha } = useGoogleReCaptcha();
+export function SignIn({ searchParams }: SignInFormProps) {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isShowPassword, setIsShowPassword] = useState<boolean>(false);
 
-  async function test() {
-    return await testGetCookie();
-  }
+  // async function test() {
+  //   return await testGetCookie();
+  // }
 
-  useEffect(() => {
-    console.log(
-      "first",
-      test()
-        .then((result) => {
-          console.log("result", result);
-        })
-        .catch((err) => {
-          console.log("err", err);
-        }),
-    );
-  }, []);
+  // useEffect(() => {
+  //   console.log(
+  //     "first",
+  //     test()
+  //       .then((result) => {
+  //         console.log("result", result);
+  //       })
+  //       .catch((err) => {
+  //         console.log("err", err);
+  //       }),
+  //   );
+  // }, []);
 
   const {
     register,

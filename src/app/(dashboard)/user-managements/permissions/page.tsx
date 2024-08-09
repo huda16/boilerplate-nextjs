@@ -1,6 +1,6 @@
 import { Breadcrumbs, Grid, Stack, Typography } from "@mui/material";
 
-import { DataTable } from "@/components/home/data-table";
+import { DataTable } from "@/components/common/data-table";
 
 export default function UserManagementsPermissionsPage() {
   return (

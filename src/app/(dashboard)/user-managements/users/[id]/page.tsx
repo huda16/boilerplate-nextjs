@@ -1,7 +1,7 @@
 import NavigateNext from "@mui/icons-material/NavigateNext";
 import { Breadcrumbs, Grid, Link, Stack, Typography } from "@mui/material";
 
-import UserManagementsUserDetail from "@/components/home/detail";
+import { DetailTable } from "@/components/common/detail-table";
 
 type UserManagementsUsersDetailPageProps = {
   searchParams: { [key: string]: string | string[] | undefined };
@@ -24,7 +24,7 @@ export default function UserManagementsUsersDetailPage({
       </Breadcrumbs>
       <Grid container spacing={3}>
         <Grid item xs={12}>
-          <UserManagementsUserDetail isEdit={searchParams.edit === "1"} />
+          <DetailTable isEdit={searchParams.edit === "1"} />
         </Grid>
       </Grid>
     </Stack>

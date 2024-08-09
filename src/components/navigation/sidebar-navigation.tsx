@@ -1,3 +1,5 @@
+"use client";
+
 import { useState } from "react";
 
 import { ExpandLess, ExpandMore } from "@mui/icons-material";
@@ -11,11 +13,11 @@ import {
 
 import { Icon } from "@/components/ui/icon";
 
-import { useGetMenu } from "@/hooks/queries/auth";
+import { useGetMenu } from "@/hooks/react-query/auth";
 
 import { MenuType } from "@/validations/auth";
 
-export const NavigationItems = () => {
+export function SidebarNavigation() {
   const getMenu = useGetMenu();
 
   const [open, setOpen] = useState<Record<string, boolean>>({});
@@ -67,4 +69,4 @@ export const NavigationItems = () => {
   };
 
   return <List>{renderMenuItems(getMenu.data as MenuType[])}</List>;
-};
+}
