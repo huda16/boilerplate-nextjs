@@ -2,7 +2,6 @@
 
 import { MouseEvent, useEffect, useState } from "react";
 
-import { AccountCircle, Send } from "@mui/icons-material";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import {
   Box,
@@ -13,7 +12,6 @@ import {
   DialogContentText,
   DialogTitle,
   IconButton,
-  ListItemIcon,
   Menu,
   MenuItem,
   Tooltip,
@@ -202,6 +200,10 @@ export function DataTable() {
   const deleteUser = useDeleteUser();
   const restoreUser = useRestoreUser();
 
+  useEffect(() => {
+    setRowSelection({});
+  }, [isTrash]);
+
   const table = useMaterialReactTable({
     columns,
     data: getUsers.data?.data ?? [],
@@ -277,34 +279,6 @@ export function DataTable() {
     onColumnFilterFnsChange: setColumnFilterFns,
     onRowSelectionChange: setRowSelection,
     renderRowActions: ({ row }) => <RowActions id={row.original.id} />,
-    renderRowActionMenuItems: ({ closeMenu }) => [
-      <MenuItem
-        key={0}
-        onClick={() => {
-          // View profile logic...
-          closeMenu();
-        }}
-        sx={{ m: 0 }}
-      >
-        <ListItemIcon>
-          <AccountCircle />
-        </ListItemIcon>
-        View Profile
-      </MenuItem>,
-      <MenuItem
-        key={1}
-        onClick={() => {
-          // Send email logic...
-          closeMenu();
-        }}
-        sx={{ m: 0 }}
-      >
-        <ListItemIcon>
-          <Send />
-        </ListItemIcon>
-        Send Email
-      </MenuItem>,
-    ],
     renderTopToolbar: ({ table }) => {
       return (
         <Box
@@ -449,10 +423,6 @@ export function DataTable() {
       );
     },
   });
-
-  useEffect(() => {
-    setRowSelection({});
-  }, [isTrash]);
 
   return <MaterialReactTable table={table} />;
 }
