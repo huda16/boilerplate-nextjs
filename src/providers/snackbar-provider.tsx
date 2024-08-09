@@ -7,5 +7,12 @@ type SnackbarProviderProps = {
 };
 
 export function SnackbarProvider({ children }: SnackbarProviderProps) {
-  return <BaseSnackbarProvider maxSnack={3}>{children}</BaseSnackbarProvider>;
+  return (
+    <BaseSnackbarProvider
+      maxSnack={3}
+      anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+    >
+      {children}
+    </BaseSnackbarProvider>
+  );
 }
